@@ -1,0 +1,68 @@
+---
+
+
+- name: install epel-release (CentOS)
+  yum:
+    name: epel-release
+    state: present
+    update_cache: yes
+  when: ansible_distribution == "CentOS"
+  
+- block:
+  - package:
+      name: monit
+      state: present
+      update_cache: yes
+
+  - setup:
+      filter: "ansible_hostname"
+
+  - name: copy notification_by_slack.sh
+    template:
+      src: notification_by_slack.sh
+      dest: /usr/local/bin/notification_by_slack.sh
+      mode: 0711
+    when: slack_hook_url is defined
+  tags:
+    - install
+
+- name: setup monit
+  block:
+    - name: set monitrc (custom)
+      copy:
+        src: "{{ custom_monitrc }}"
+        backup: yes
+        dest: /etc/monit/monitrc
+        group: root
+        owner: root
+        mode: 0600
+      when: custom_monitrc is defined
+
+    - name: set monit config (custom)
+      copy:
+        src: "{{ item.src }}/{{ item.filename }}"
+        backup: yes
+        dest: "/etc/monit/conf-available/{{ item.filename }}"
+        group: root
+        owner: root
+        mode: 0644
+      with_items:
+        - "{{ custom_monit_conf }}"
+      notify: restart_monit
+      when: custom_monit_conf is defined
+
+    - name: "Create monit conf-enabled link | {{ item.filename }}"
+      file:
+        src: "/etc/monit/conf-available/{{ item.filename }}"
+        dest: "/etc/monit/conf-enabled/{{ item.filename }}"
+        owner: root
+        group: root
+        state: link
+      with_items:
+        - "{{ custom_monit_conf }}"
+      notify: reload_monit
+      when: custom_monit_conf is defined
+
+  become: yes
+  tags:
+    - setup
