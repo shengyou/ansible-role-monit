@@ -1,1 +1,14 @@
 ---
+
+
+monit_version: 5.25.1
+
+monitrc_path:
+  CentOS6: /etc/monit.conf
+  CentOS7: /etc/monitrc
+  Ubuntu14: /etc/monit/monitrc
+  Ubuntu16: /etc/monit/monitrc
+
+monit_config_path:
+  CentOS: /etc/monit.d
+  Ubuntu: /etc/monit/conf.d

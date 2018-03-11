@@ -1,6 +1,6 @@
 ---
 
-- name: reload_monit
+- name: restart_monit
   service:
     name: monit
-    state: reloaded
+    state: restarted

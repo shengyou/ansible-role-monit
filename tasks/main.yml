@@ -1,18 +1,9 @@
 ---
 
 
-- name: install epel-release (CentOS)
-  yum:
-    name: epel-release
-    state: present
-    update_cache: yes
-  when: ansible_distribution == "CentOS"
-  
 - block:
-  - package:
-      name: monit
-      state: present
-      update_cache: yes
+  - include_tasks: "{{ ansible_distribution }}-install.yml"
+    when: ansible_distribution == "Ubuntu" or ansible_distribution == "CentOS"
 
   - setup:
       filter: "ansible_hostname"
@@ -23,16 +14,29 @@
       dest: /usr/local/bin/notification_by_slack.sh
       mode: 0711
     when: slack_hook_url is defined
+  become: yes
   tags:
     - install
 
 - name: setup monit
   block:
+    - name: get monitrc path
+      set_fact:
+        monitrc_path: "{{ monitrc_path[item] }}"
+      with_items:
+        - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}"
+
+    - name: get monit config path
+      set_fact:
+        monit_config_path: "{{ monit_config_path[item] }}"
+      with_items:
+        - "{{ ansible_distribution }}"
+
     - name: set monitrc (custom)
       copy:
         src: "{{ custom_monitrc }}"
         backup: yes
-        dest: /etc/monit/monitrc
+        dest: "{{ monitrc_path }}"
         group: root
         owner: root
         mode: 0600
@@ -40,27 +44,15 @@
 
     - name: set monit config (custom)
       copy:
-        src: "{{ item.src }}/{{ item.filename }}"
+        src: "{{ item.src }}"
         backup: yes
-        dest: "/etc/monit/conf-available/{{ item.filename }}"
+        dest: "{{ monit_config_path }}/{{ item.dest_filename }}"
         group: root
         owner: root
         mode: 0644
       with_items:
         - "{{ custom_monit_conf }}"
       notify: restart_monit
-      when: custom_monit_conf is defined
-
-    - name: "Create monit conf-enabled link | {{ item.filename }}"
-      file:
-        src: "/etc/monit/conf-available/{{ item.filename }}"
-        dest: "/etc/monit/conf-enabled/{{ item.filename }}"
-        owner: root
-        group: root
-        state: link
-      with_items:
-        - "{{ custom_monit_conf }}"
-      notify: reload_monit
       when: custom_monit_conf is defined
 
   become: yes

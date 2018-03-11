@@ -1,0 +1,72 @@
+
+
+- name: install monit
+  apt:
+    name: monit
+    state: present
+    update_cache: yes
+
+- name: download monit binary
+  get_url:
+    url: "https://mmonit.com/monit/dist/binary/{{ monit_version }}/monit-{{ monit_version }}-linux-x64.tar.gz"
+    dest: /tmp/monit-{{ monit_version }}-linux-x64.tar.gz
+
+- name: unarchive monit binary
+  unarchive:
+    src: "/tmp/monit-{{ monit_version }}-linux-x64.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+
+- name: copy monit binary
+  copy:
+    src: "/tmp/monit-{{ monit_version }}/bin/monit"
+    dest: /usr/bin/monit
+    owner: root
+    group: root
+    mode: u+x
+    remote_src: yes
+
+- name: mkdir /etc/monit
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+  with_items:
+    - /etc/monit/
+    - /etc/monit/conf.d
+    - /etc/monit/conf-available
+    - /etc/monit/conf-enabled
+    - /var/lib/monit
+
+- name: setup /etc/monit/monitrc
+  copy:
+    src: monitrc
+    dest: /etc/monit/monitrc
+    owner: root
+    group: root
+    mode: 0700
+
+- name: setup /etc/monit/monitrc
+  file:
+    src: /etc/monit/monitrc
+    dest: /etc/monitrc
+    state: link
+    owner: root
+    group: root
+    mode: 0700
+
+- name: setup /etc/init.d/monit
+  copy:
+    src: init_monit
+    dest: /etc/init.d/monit
+    owner: root
+    group: root
+    mode: u+x
+
+- name: setup /etc/default/monit
+  copy:
+    src: etc_default_monit
+    dest: /etc/default/monit
+    owner: root
+    group: root

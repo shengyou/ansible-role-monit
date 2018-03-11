@@ -16,6 +16,22 @@ Requirements
 Role Variables
 --------------
 
+以下為預設值，通常無需變更。
+
+```
+monit_version: 5.25.1
+
+monitrc_path:
+  CentOS6: /etc/monit.conf
+  CentOS7: /etc/monitrc
+  Ubuntu14: /etc/monit/monitrc
+  Ubuntu16: /etc/monit/monitrc
+
+monit_config_path:
+  CentOS: /etc/monit.d
+  Ubuntu: /etc/monit/conf.d
+```
+
 以下 Variables 非必填項目，想要設定客製的 monit config 才需要設置。
 
 使用方式請參考範例。
@@ -45,11 +61,11 @@ Example Playbook
   vars:
    - custom_monitrc: /path/to/your/custom_monitrc
 
-   - custom_monit_conf::
+   - custom_monit_conf:
        - src: /path/to/monit_configs
-         filename: monit_config_filename
-       - src: /path/to/monit_configs
-         filename: monit_config_filename
+         dest_filename: monit_config_filename
+       - src: /path/monit_storage
+         dest_filename: storage
 
    - slack_hook_url: "https://hook.slack.com/xxxxxxxxxx"
 
