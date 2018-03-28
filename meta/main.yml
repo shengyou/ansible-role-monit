@@ -2,7 +2,7 @@ galaxy_info:
   author: Cheng Wei Chen
   company: TheQwan
 
-  license: license (GPLv2, CC-BY, etc)
+  license: MIT
 
   min_ansible_version: 2.4
 
