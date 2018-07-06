@@ -6,7 +6,14 @@ MONIT_EVENT=$1
 MONIT_HOST="{{ ansible_hostname }}"
 MONIT_DATE=$(date -R)
 
-COLOR=${MONIT_COLOR:-$([[ $MONIT_EVENT == *"succeeded"* ]] && echo good || echo danger)}
+if [ -z "$2" ]
+  then
+    COLOR="danger"
+
+else
+  COLOR=$2
+fi
+
 TEXT=$(echo -e "$MONIT_EVENT" | python3 -c "import json,sys;print(json.dumps(sys.stdin.read()))")
 
 PAYLOAD="{
