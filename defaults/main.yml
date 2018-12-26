@@ -1,6 +1,6 @@
 ---
 
-
+os_bit: "x64"
 monit_version: 5.25.1
 
 monitrc_path:

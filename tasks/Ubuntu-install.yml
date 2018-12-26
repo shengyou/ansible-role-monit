@@ -1,19 +1,13 @@
 
 
-- name: install monit
-  apt:
-    name: monit
-    state: present
-    update_cache: yes
-
 - name: download monit binary
   get_url:
-    url: "https://mmonit.com/monit/dist/binary/{{ monit_version }}/monit-{{ monit_version }}-linux-x64.tar.gz"
-    dest: /tmp/monit-{{ monit_version }}-linux-x64.tar.gz
+    url: "https://mmonit.com/monit/dist/binary/{{ monit_version }}/monit-{{ monit_version }}-linux-{{ os_bit }}.tar.gz"
+    dest: /tmp/monit-{{ monit_version }}-linux-{{ os_bit }}.tar.gz
 
 - name: unarchive monit binary
   unarchive:
-    src: "/tmp/monit-{{ monit_version }}-linux-x64.tar.gz"
+    src: "/tmp/monit-{{ monit_version }}-linux-{{ os_bit }}.tar.gz"
     dest: /tmp/
     remote_src: yes
 

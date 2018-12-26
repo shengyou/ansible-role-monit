@@ -4,10 +4,14 @@
     name: epel-release
     state: present
     update_cache: yes
-  when: ansible_distribution == "CentOS"
 
 - name: install monit
   yum:
     name: monit
     state: present
     update_cache: yes
+
+- name: Enable service monit
+  service:
+    name: monit
+    enabled: yes
