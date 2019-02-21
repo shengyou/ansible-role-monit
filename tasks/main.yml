@@ -17,6 +17,7 @@
   become: yes
   tags:
     - install
+    - monit_install
 
 - name: setup monit
   block:
@@ -58,3 +59,4 @@
   become: yes
   tags:
     - setup
+    - monit_setup
